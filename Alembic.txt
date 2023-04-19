@@ -1,0 +1,6 @@
+1) pip install alembic
+2) alembic init migrations
+3) update the sqlalchemy.url to the url of the database inside the alembic.ini file
+4) update the target_metadata in the enc.py file
+5) alembic revision --autogenerate -m "anyname"
+6) alembic upgrade head
