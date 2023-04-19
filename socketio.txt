@@ -1,0 +1,10 @@
+Socketio
+Creates a bidirectional connection between client and server.
+Http runs on single request-response cycle, but if we want to get real-time data we have to use sockets.
+Sockets have events of two types:
+1) Predefined: Connect, Disconnect, Message, JSON
+2) Custom events: any_name_we_want
+Any data that we exchange comes into events.
+
+Whenever we use send to transport messages we send them to a default event message we can there retrieve that message.
+To send to a particular event bucket we use the emit method.

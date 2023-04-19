@@ -1,0 +1,259 @@
+Working with geospatial data in elastic search 
+-------------------------------------------------
+
+-->creating index for geospatial data
+
+PUT /my_geospatial_index
+{
+  "mappings": {
+    "properties": {
+      "location": {
+        "type": "geo_point"
+      }
+    }
+  }
+}
+------------------------------------------------------
+--> adding documents into it 
+
+POST /my_geospatial_index/_doc/5
+{
+  "location": {
+    "lat": 40.73,
+    "lon": -73.98
+  },
+  "name": "New York City"
+}
+
+POST /my_geospatial_index/_doc/4
+{
+  "location": {
+    "lat": 37.7749,
+    "lon": -122.4194
+  },
+  "name": "San Francisco"
+}
+
+POST /my_geospatial_index/_doc/3
+{
+  "location": {
+    "lat": 34.0522,
+    "lon": -118.2437
+  },
+  "name": "Los Angeles"
+}
+
+POST /my_geospatial_index/_doc/1
+{
+  "location": {
+    "lat": 51.5074,
+    "lon": -0.1278
+  },
+  "name": "London"
+}
+
+POST /my_geospatial_index/_doc/2
+{
+  "location": {
+    "lat": 35.6895,
+    "lon": 139.6917
+  },
+  "name": "Tokyo"
+}
+
+POST /my_geospatial_index/_doc/8
+{
+  "location": {
+    "lat": 1.325700,
+    "lon": 103.921890
+  },
+  "name": "Bhopal"
+}
+-----------------------------------------------------
+
+--> now searching the documents in the radius of 10 km from "xyz" location 
+
+GET /my_geospatial_index/_search
+{
+  "query": {
+    "bool": {
+      "must": {
+        "match_all": {}
+      },
+      "filter": {
+        "geo_distance": {
+          "distance": "10km",
+          "location": {
+            "lat": 40.73,
+            "lon": -73.98
+          }
+        }
+      }
+    }
+  }
+}
+
+---------------------------------------------------------------------
+
+-->get all the location near from my "xyz" location distance as a asending order
+
+GET /my_geospatial_index/_search?pretty
+{
+"query": { 
+  "match_all": {  } 
+}, 
+ "sort" : [
+ {
+ "_geo_distance" : { 
+
+ "location" : "23.891514,80.410392", 
+ "order" : "asc", 
+ "unit" : "km" 
+ }
+ }
+ ]
+}
+
+-------------------------------------------------------------------
+
+--> geting the location of the range --100 , 100-5000, 5000--
+
+GET /my_geospatial_index/_search
+{
+  "query": {
+    
+        "match_all": {}
+      },
+       "aggs" : {
+         "events_ranges" : {
+         "geo_distance" : {
+         "field" : "location.geolocation",
+         "origin" : "40.0, -105.0",
+         "unit": "km",
+         "ranges" : [
+         { "to" : 100 },
+         { "from" : 100, "to" : 5000 },
+         { "from" : 5000 }
+         ]
+         }
+         }
+         }}
+
+---------------------------------------------------------
+
+getting the location which are in specific shape we are giving
+
+GET /my_geospatial_index/_search
+{
+  "query": {
+    "bool": {
+      "must": {
+        "match_all": {}
+      },
+      "filter": {
+        "geo_bounding_box": {
+          "location": {
+            "top_left": {
+              "lat": 37.8,
+              "lon": -122.5
+            },
+            "bottom_right": {
+              "lat": 37.7,
+              "lon": -122.4
+            }
+          }
+        }
+      }
+    }
+  }
+}
+----------------------------------------------------------
+
+getting the location which are outside that shape
+
+GET /my_geospatial_index/_search
+{
+  "query": {
+    
+        "match_all": {}
+      },
+ "aggs" : {
+ "events_box": {
+ "geo_bounds": {
+ "field": "location"
+ }
+ }
+ }}
+
+------------------------------------------------------------
+-->geohash_cell
+
+GET /my_geospatial_index/_search
+{
+  "query": {
+    "bool": {
+      "must": {
+        "match_all": {}
+      },
+      "filter": {
+        "geohash_cell": {
+          "location": "dr5r9ydj2y73",
+          "precision": 5
+        }
+      }
+    }
+  }
+}
+------------------------------------------------------------
+-->geohash_grid
+
+GET /my_geospatial_index/_search
+{
+  "size": 0,
+  "aggs": {
+    "grid": {
+      "geohash_grid": {
+        "field": "location",
+        "precision": 5
+      }
+    }
+  }
+}
+--------------------------------------------------------------
+
+--> mapping a index for a park (my_park)
+
+PUT /my_parks_index
+{
+  "mappings": {
+    "properties": {
+      "name": { "type": "text" },
+      "area": {
+        "type": "geo_shape",
+        "tree": "quadtree",
+        "precision": "1m"
+      }
+    }
+  }
+}
+
+----------------------------------------------------------
+
+putting the document name as centraalpark of polygen shape
+
+POST /my_parks_index/_doc
+{
+  "name": "Central Park",
+  "area": {
+    "type": "polygon",
+    "coordinates": [
+      [
+        [-73.965355, 40.782865],
+        [-73.964955, 40.782405],
+        [-73.961830, 40.784003],
+        [-73.962230, 40.784463],
+        [-73.965355, 40.782865]
+      ]
+    ]
+  }
+}

@@ -1,0 +1,75 @@
+Tasks for Today:
+
+Solve 2 Leetcode questions - Done
+1) Group Anagrams
+2) Kmost frequent elements
+3) Product of array except self
+
+Data class - Done
+Dataclasses are classes which are used for storing and viewing data
+using the @dataclass decorator
+generates the init and repr methods
+We can check if two objects are equal. 
+if we use normal class with == then we'll get false because here the location of the data is compared
+if we use data class then the data of the objects in compared
+The data class decorator takes following args as well:
+
+	@dataclass(*, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False,slots=False)
+Using dataclass we can also use the >,<,>=,<=
+frozen is similar to the const keyword from C++
+We can also add default values for all the variables
+We can also derive an attribute from other after initialization using the __post_init__() function
+
+Example:
+from dataclasses import dataclass,field
+import random
+def rand_int():
+    return random.randint(0,10000)
+@dataclass
+class Person():
+    name:str
+    addr:str
+    active:str = True 
+    email_addrs:list[str] = field(default_factory=list)
+    id: int = field(default_factory = rand_int,init=False)
+    # init in the above statement will ensure that we cannot pass if while creating object
+    search_str:str = field(init=False,repr=False)
+    # repr=False will ensure that the variable will not be present in the repr method
+    def __post_init__(self):
+        self.search_str = f"{self.name} {self.addr}"            
+p = Person(name="Tejas",addr="Pune")
+q = Person(name="Tejas",addr="Pune")
+print(p)
+
+
+
+
+Slots
+Classes usually store data in dictionaries in the background. 
+As dicts are dynamic we can add any attribute to it, python cannot allocate a static memory storage at object creation
+Dicts also contain info other than key-value pairs
+Descriptors__ any descriptor has 3 methods - get,set and delete
+If we dont need to add attributes to the object dynamically, we should use slots
+Almost 20% faster than regular dict
+Example:
+class pslots():
+    __slots__= "name","addr","mail"
+    def __init__(self,name,addr,mail):
+        self.name = name
+        self.addr= addr
+        self.mail= mail
+
+Accessing instance variables of a class faster
+
+
+Mixins in python:
+Mixins are used to decrease redundancy in code
+Lets say class A has attribute total
+Classes B and C inherit from A
+Classes D and E inherit from B and C resp.
+Now we want to implement print(total) in both class. If we write code in both places we dont follow the DRY principle
+Instead we just create a mixin class which implements the req func 
+and then we inherit D from B and mixin and inherit E from C and mixin
+
+
+Git

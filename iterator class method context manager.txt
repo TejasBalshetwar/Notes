@@ -1,0 +1,129 @@
+Task for Today:
+solve 2 leetcode questions
+
+Iterators in python: Done
+class Test: 
+	def __init__(self, limit): 
+		self.limit = limit 
+
+	def __iter__(self): 
+		self.x = 10 
+		return self 
+	def __next__(self): 
+		x = self.x 
+		if x > self.limit: 
+			raise StopIteration 
+		self.x = x + 1 
+		return x 
+
+for i in Test(15): 
+	print(i)
+
+Property Decorators python - Done
+property decorators are used when we want to use the setter
+@property sets the function name as an attribute
+We can later use this property with setter to set the values and deleter to delete the values
+
+Exmaple:
+class Employee():
+    def __init__(self,*args,**kwargs):
+        self.first = args[0]
+        self.last = args[1]
+        
+    @property
+    def email(self):
+        return f"{self.first}.{self.last}@email.com"
+    
+    @property
+    def fullname(self):
+        return f"{self.first} {self.last}"
+      
+     # setter 
+    @fullname.setter
+    def fullname(self,name):
+        first,last = name.split(" ")
+        self.first = first
+        self.last = last
+    
+    # deleter
+    @fullname.deleter
+    def fullname(self):
+        print("Name Deleted!")
+        self.first = None
+        self.last = None
+        
+emp = Employee("tejas","balshetwar")
+emp.fullname = "tejas new"
+del emp.fullname
+print(emp.fullname)
+
+
+
+
+class method,static method - Done
+class Employee():
+    company = "youtube"
+    def __init__(self,first,last):
+        self.first = first
+        self.last = last
+    
+    def get_mail(self):
+        return f"{self.first}.{self.last}@{Employee.company}.com"
+    
+    @classmethod
+    def change_company(cls,new_name):
+        cls.company = new_name
+        return new_name
+    
+    @staticmethod
+    def stat():
+        print("This is a static method")
+
+emp = Employee("tejas","balshetwar")
+emp2= Employee("John","Doe")
+print(emp.get_mail())
+# Employee.company = "hexaview"
+# cannot change class variables using objects
+Employee.change_company("Tjas")
+print(emp.get_mail())
+print(emp2.get_mail())
+
+Using class method as alternative constructors
+emp3_str = "Steve-Smith
+emp3 = Employee.from_string(emp3_str)
+
+implementation for from_string() method:
+
+@classmethod
+def from_string(cls,emp_str):
+	first,last = emp_str.split("-")
+	return cls(first,last)
+
+Example the datetime module uses this technique
+
+
+
+
+custom context manager: Done
+class MyObj():
+    def __init__(self,name):
+        self.name = name
+    
+    def __enter__(self):
+        print("starting the context manager")
+        return self
+    
+    def __exit__(self,exec_type,exec_val,exec_tb):
+        print("exiting the context manager")
+        del self
+        return True
+        
+
+        
+with MyObj("Tejas") as ob:
+    print("inside the context manager")
+
+print(ob.name)s
+
+
+security in elasticsearch (IAM)

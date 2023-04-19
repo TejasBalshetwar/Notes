@@ -1,0 +1,85 @@
+Metaclasses python
+In old-style class in python the class and type are different *(python 2.7)
+example:
+class Foo():
+	pass
+f= Foo()
+print(f.__class__) # Foo
+print(type(f)) # instance
+o/p - first print will give Foo as output and second print will give instance as output
+In new-style python the __class__ and type are same i.e both are Foo
+
+In new python everything is an object
+Example:
+class Foo():
+	pass
+x= Foo()
+print(type(x))  # Foo
+print(type(Foo))  # type
+print(type(float)) # type
+print(type(list)) # type
+print(type(type)) # type
+type is a metaclass in python of which classes are instances
+
+Example:
+Foo = type("Foo",(),{})
+# similar to 
+# class Foo():
+#     pass
+x= Foo()
+print((x))
+
+Example 2:
+Foo = type("Foo",(),{})
+
+Bar = type("Bar",(Foo,),{"attr":100})
+#similar to
+# class Bar(Foo):
+# attr =100
+a = Bar()
+print(a.attr) # 100
+print(a.__class__) # <class '__main__.Bar'>
+print(a.__class__.__bases__) # (<class '__main__.Foo'>,)
+
+Example 3:
+Foo  = type(
+    "Foo",
+    (),
+    {
+        "attr":100,
+        "attr_value":lambda x: x.attr
+    }
+    )
+    
+# similar to 
+# class Foo():
+#     attr = 100
+#     def attr_value(self):
+#         return self.attr
+x = Foo()
+print(x.attr) #100
+print(x.attr_value()) # 100
+
+Example 4:
+def f(obj):
+    return obj.attr
+
+Foo = type("Foo",(),{"attr":100,"attr_value":f})
+x = Foo()
+print(x.attr_value())
+
+Creating your own Metaclass:
+class Meta(type):
+    def __new__(cls, name, bases, dct):
+        x = super().__new__(cls, name, bases, dct)
+        x.attr = 100
+        return x
+The defualt metaclass of all classes is type
+to change it we have to pass the metclass arg while creating a new class
+class Foo(metaclass = Meta):
+	pass
+
+Metaclass acts as a template for creating the classes also called class factories
+They allow customization of class instantiation.
+Use of metaclasses is not necessary
+Just knowing how they work can be enough

@@ -1,0 +1,17 @@
+Garbage collection python:
+A garbage collection in Python manages the memory automatically and heap allocation. In simpler terms, the process of automatic deletion of unwanted or unused objects to free the memory is called garbage collection in Python.
+The Python interpreter schedules the garbage collection because discovering the reference cycle is computational work.
+Python uses two strategies to implement garbage collection. The first one is Reference Counting, and the other one is the Generational Garbage Collection.
+Apart from the automatic garbage collection running on hitting the threshold, we can also invoke the garbage collection in Python manually using the gc module.
+The garbage collector in Python starts running as soon as the program's execution starts. Whenever the object's reference counter reaches 0, the garbage collector is triggered.
+Whenever a new name or alias is assigned to an object, its reference count increases. Or, when an object is inserted or placed into containers such as lists, tuples, or dictionaries, the reference count of the object increases.
+An object's reference counter decreases when the object is deleted. Whenever the reference count of an object reaches 0, there is no one to refer to that instance of the memory location.
+The main aim of garbage collection in Python is to reduce memory leaks. A garbage collector also makes sure of memory safety.
+A reference cycle is a scenario in which a no longer used object cannot be deleted by the garbage collection in Python as the reference counter cannot reach 0.
+The garbage collection in Python is an additional process running in the background, so it is an overhead and thus impacts performance.
+
+Generational Grabage collection:
+1) Automatic after a cretain number of allocation- deallocation
+2) manually - time scheduling, event trigger
+3) Forced 
+4) disbaling the garbage collection

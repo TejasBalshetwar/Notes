@@ -1,0 +1,47 @@
+Multithreading:
+3 stages
+Creation of thread
+|
+Running the thread - (blocked)
+|
+Exiting (normal or exception)
+
+threading.Thread object has following properties:
+1) thread.name
+2) thread.daemon: bool - thread is daemon(background) or not (pronounced as dee mon)
+3) thread.ident: unique identifier -assigneed when thread starts
+4) thread.native_id: id assigned to thread bny OS as python threads are native threads
+5) thread.isalive(): thread running or not
+Only the name of the thread and whether the thread is daemon or not can be changed
+
+
+threading.current_thread() to get current thread
+threading.main_thread() to get the main thread
+threading.active_count() to get the number of alive threads
+threading.get_ident() to get the identifier of the current thread
+threading.get_native_id() to get the native OS id of the thread
+threading.enumerate() to get the list of all active threads
+
+For unhandled exceptions:
+threading.excepthook = custom_hook
+the custonm_hook function is called when the unhandled exception occurs
+GIL is mutual exclusion lock.
+
+Threads can store local data via an instance of the threading.local class.
+This is like a namespace limited to each thread and is called “thread-local data”. It means that threads cannot access or read the local data of other threads
+local = threading.local()
+local.name = "tejas"
+
+Thread mutex lock:
+A mutex lock is used to protect critical sections of code from concurrent execution.
+You can use a mutual exclusion (mutex) lock in Python via the threading.Lock class.
+It is a synchronization primitive used to prevent race conditions
+A mutex lock can be used to ensure that only one thread at a time executes a critical section of code at a time, while all other threads trying to execute the same code must wait until the currently executing thread is finished with the critical section and releases the lock.
+Each thread must attempt to acquire the lock at the beginning of the critical section. If the lock has not been obtained, then a thread will acquire it and other threads must wait until the thread that acquired the lock releases it.
+We can create one instance of the threading.Lock shared among the threads, and pass it to each thread that we intend to execute the target task function.
+
+Thread reentrant lock:
+A thread may need to acquire the same lock more than once for many reasons.
+A limitation of a (non-reentrant) mutex lock is that if a thread has acquired the lock that it cannot acquire it again. In fact, this situation will result in a deadlock as it will wait forever for the lock to be released so that it can be acquired, but it holds the lock and will not release it.
+A reentrant lock will allow a thread to acquire the same lock again if it has already acquired it. This allows the thread to execute critical sections from within critical sections, as long as they are protected by the same reentrant lock.
+

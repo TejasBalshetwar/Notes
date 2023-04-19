@@ -1,0 +1,55 @@
+Different types of cache:
+
+1) Embedded cache:
+Most common
+mappings or reference lookups
+reduce latency betn database and application
+copy of data from database so we can reduce the lookups
+private cache
+cache is stored in the application
+
+2) Client-Server cache:
+follows client server architecture
+cache is on its own instance
+multiple applications can interact
+shared caches,standalone cache
+
+3) Distributed cache
+to decrese the load on the cache server we create multiple cache servers which serve requests of multiple applications(clients)
+low latency high volume
+
+4) Cloud cache or CSP Managed cache
+These caches are managed by the CSP itself
+Example Amazon ElastiCache
+It is distributed
+Managed cache
+Scalability
+
+5) Reverse-Proxy cache:
+cache resposnses received from the server
+load balancer store the cache
+API response cache
+No specific maintenance
+
+6) Side-car cache:
+In kubernetes cluster there are different pods having containers
+in this type of caching we store the cache in the pod alongside the container
+if we have 3 pods running 3 containers, we'll have 3 cache instances in those pods
+easy to containerize
+low latency
+app and data isolation
+
+7) Reverse-proxy Side-car cache:
+combination of both the types
+containerized caches
+low latency
+API responses
+App and data isolation
+No app specific maintainence
+
+Considerations while caching:
+1) Lifetime of cached data
+2) Cache eviction - remove stale information from cache
+3) consistency - instantaneous, eventual
+4) Priming the cache - loading and evicting processes
+

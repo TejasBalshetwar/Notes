@@ -1,0 +1,5 @@
+Disadvantages of ES:
+1) Upgrade - time consuming, risky
+2) Security
+3) Performance - tuning of resources,
+4) Maintainence

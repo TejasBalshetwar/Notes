@@ -1,0 +1,48 @@
+SOLID principles
+
+S -> Single Responsibility
+O -> Open-Closed
+L -> Liskov Substitution
+I -> Interface Segregation
+D -> Dependency Inversion
+
+Single Responsibility:
+It means that a piece of code should have only one responsibility
+For e.g
+The order class shouldn't have to deal with payment processing. So we create a new class for payment processing
+
+Open-Close:
+Program must be open for new functionalities but closed for modifications
+Use of class and subclass
+use Abstract class and abstract method
+
+Liskov principle:
+Functions that use pointers or references to base classes must be able to use objects of derived classes without knowing it.
+The child class must not violate its base class characteristics. It must be capable with it. We can say it's same as subtyping.
+Example:
+All of the methods take X and Y coordinates as parameters to locate the tile position in the two-dimensional array of Tiles. This will allow a game developer to manage units in the board during the course of the game.
+
+The book goes on to change the requirements to say that the game frame work must also support 3D game boards to accommodate games that have flight. So a ThreeDBoard class is introduced that extends Board.
+
+At first glance this seems like a good decision. Board provides both the Height and Width properties and ThreeDBoard provides the Z axis.
+
+Where it breaks down is when you look at all the other members inherited from Board. The methods for AddUnit, GetTile, GetUnits and so on, all take both X and Y parameters in the Board class but the ThreeDBoard needs a Z parameter as well.
+
+So you must implement those methods again with a Z parameter. The Z parameter has no context to the Board class and the inherited methods from the Board class lose their meaning. A unit of code attempting to use the ThreeDBoard class as its base class Board would be very out of luck.
+
+Maybe we should find another approach. Instead of extending Board, ThreeDBoard should be composed of Board objects. One Board object per unit of the Z axis.
+
+This allows us to use good object oriented principles like encapsulation and reuse and doesn’t violate LSP.
+
+Interface Segregation:
+Several specific interfaces than one general interface
+Example:
+Payment processor Abstract class has pay method
+we want to implement 2FA for debit and paypal only not credit
+but if we add 2fa method in payemnt processor we'll have to override it in credit class as well that will raise and exception
+we dont want this to happen
+So what we can do is create a new class for payment2fa that inherits from paymentProcessor and has abstract method of 2fa
+We can then inherit from the payment2fa class in debit and paypal and use the original class of paymentProcessor for credit class
+
+Dependency Inversion:
+Our class should depend upon abstract classes and not concrete classes

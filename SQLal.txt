@@ -1,0 +1,40 @@
+SQLAlchemy:
+
+1) Engine: a factory for database connections which are maintained by a connection pool
+
+2) Dialect: interprets generic SQL and database commands in terms of a specific DBAPI and database backend(hidden)
+
+3) Connection pool: holds a collection of database connections in memory for fast reuse
+
+4) SQL Expression Language: Allows SQL statements to be written using python expressions
+
+5) Schema/Types: Uses python objects to represent tables,columns and datatypes
+
+
+SQLAlchemy-ORM:
+
+Allow construction of python objects which can be mapped to relational database tables.
+Transparently persists objects into their corresponding database tables using the unit of work pattern
+Provides a query system which loads objects and attributes using SQL generated from mappings
+Builds on top of the core - uses the core to generate SQL and talk to the database
+Presents a slightly more object centric perspective, as opposed to the schema centric perspective
+
+Four layers of SQLAlchemy:
+1) Object Relational Mapping
+2) SQL Expressions
+3) Table Metadata,Reflection, DDL
+4) Engine, Connection, Transactions
+
+
+STEPS FOR WORKING WITH SQLALCHEMY:
+
+1) import create_engine from sqlalchemy
+2) engine = create_engine(url) e.g. url = sqlite:///' + os.path.join(basedir, 'finance.sqlite) 
+3) connection = engine.connect()
+4) from sqlalchemy import text - this wil help us write SQL statements
+5) stmt  = text("SELECT * FROM users where user_id=:user_id")
+6) To execute the above statment use the below code:
+	res = connection.execute(stmt,{'user_id':2})
+7) To fetch a single row use:
+	row = result.fetchone()
+8) This is similar to a namedTuple. We can access a particular element like username from row as " row._mapping['username'] ". By using mapping we viewing it in dictionary view

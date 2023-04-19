@@ -1,0 +1,61 @@
+Steps for using Kafka-cli:
+1) Create a docker-compose with following code:
+version: '2'
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper:3.4.6
+    ports:
+     - "2181:2181"
+  kafka:
+    image: wurstmeister/kafka
+    ports:
+     - "9092:9092"
+    expose:
+     - "9093"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "topic_test:1:1"
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock
+2) Run this docker-compose and you will get kafka and zookeeper containers.
+
+3) Open terminal for the kafka container and navigate to opt/kafka/bin
+
+4) To create a topic in Kafka use the following command:
+kafka-topics.sh --create --topic new-topic --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1
+
+5) To describe a topic use the following command:
+kafka-topics.sh --bootstrap-server=localhost:9092 --describe --topic my-topic
+
+6) To list all the topics use the following command:
+kafka-topics.sh --bootstrap-server=localhost:9092 --list
+
+7) To publish to a topic :
+kafka-console-producer.sh --topic new-topic --bootstrap-server localhost:9092
+
+This will open a prompt where you can type the messages to publish. Each time enter is pressed a new message is submitted.
+
+8) To consume a topic:
+kafka-console-consumer.sh --topic new-topic --from-beginning --bootstrap-server localhost:9092
+
+This will show all the messages from beginning inside a topic.
+
+9) Change Message Rentention time:
+kafka-topics.sh --zookeeper=localhost:2181 --alter --topic new-topic --config retention.ms=300000*
+
+This sets a retention period of 5 minutes for all messages appended to the topic “new-topic“.
+
+10) Add partitions to a topic:
+kafka-topics.sh --zookeeper=localhost:2181 --alter --topic my-topic --partitions 10
+
+11) Delete a Topic:
+kafka-topics.sh --zookeeper localhost:2181 --delete --topic my-topic
+
+If you have set a message retention policy first delete that before deleting the topic
+kafka-topics.sh --zookeeper localhost:2181 --alter --topic mytopic --delete-config retention.ms
+
+

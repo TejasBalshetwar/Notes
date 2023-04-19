@@ -1,0 +1,329 @@
+GET orders/_mapping
+
+# Metric Aggregations
+# single-value numeric and multi-value numeric 
+
+#sum aggregation
+GET orders/_search
+{
+  "size": 0, 
+  "aggs": {
+    "total_sales": {
+      "sum": {
+        "field": "total_amount"
+      }
+    }
+  }
+}
+
+#avg aggregation
+GET orders/_search
+{
+  "size": 0, 
+  "aggs": {
+    "avg_sales": {
+      "avg": {
+        "field": "total_amount"
+      }
+    }
+  }
+}
+
+# min and max aggregation
+GET orders/_search
+{
+  "size": 0,
+  "aggs": {
+    "min_sales": {
+      "min": {
+        "field": "total_amount"
+      }
+    },
+    "max_sales":{
+      "max": {
+        "field": "total_amount"
+      }
+    }
+  }
+}
+
+
+# cardinality  - counts unique value for each field -approx
+GET orders/_search
+{
+  "size": 0, 
+  "aggs": {
+    "total_salesman":{
+      "cardinality": {
+        "field": "salesman.id"
+      }
+    }
+  }
+}
+
+
+# number of orders
+GET orders/_search
+{
+  "size": 0, 
+  "aggs": {
+    "values_count":{
+      "value_count": {
+        "field": "total_amount"
+      }
+    }
+  }
+}
+
+# stats aggregation
+GET orders/_search
+{
+  "size": 0, 
+  "aggs": {
+    "amount_stats":{
+      "stats": {
+        "field": "total_amount"
+      }
+    }
+  }
+}
+
+
+## Bucket Aggregations
+# buckets are just set of documents created on some criterion
+
+# a bucket will be created for each status value
+GET orders/_search
+{
+  "size": 0,
+  "aggs": {
+    "status_terms": {
+      "terms": {
+        "field": "status",
+        "missing": "N/A",
+        "min_doc_count": 0,
+        "order": {
+          "_key": "asc"
+        }
+      }
+    }
+  }
+}
+
+
+GET orders/_search
+{
+  "size": 0,
+  "aggs": {
+    "status_terms": {
+      "terms": {
+        "field": "total_amount"
+      }
+    }
+  }
+}
+
+# nested aggregations - agg inside an agg
+GET orders/_search
+{
+  "size": 0,
+  "aggs": {
+    "status_terms": {
+      "terms": {
+        "field": "status"
+      },
+      "aggs": {
+        "status_stats": {
+          "stats": {
+            "field": "total_amount"
+          }
+        }
+      }
+    }
+  }
+}
+
+# filtering the documents
+# in this query the avg_amount aggregation is only applied to the results of the range query inside filter
+# the filter query runs in query context and avg_amount runs in agg context
+GET orders/_search
+{
+  "size": 0,
+  "aggs": {
+    "low_value": {
+      "filter": {
+        "range": {
+          "total_amount": {
+            "lte": 50
+          }
+        }
+      },
+      "aggs": {
+        "avg_amount": {
+          "avg": {
+            "field": "total_amount"
+          }
+        }
+      }
+    }
+  }
+}
+GET orders/_search
+{
+  "query": {
+    "match": {
+      "sales_channel": "web"
+    }
+  }
+}
+
+# bucket with filters
+GET orders/_search
+{
+  "size": 0,
+  "aggs": {
+    "my_filter": {
+      "filters": {
+        "filters": {
+         "saleschannel":{
+           "match":{
+             "sales_channel":"web"
+           }
+         },
+         "flynn":{
+           "match":{
+             "salesman.name":"flynn"
+           }
+         }
+        }
+      },
+      "aggs": {
+        "avg_amount": {
+          "avg": {
+            "field": "total_amount"
+          }
+        }
+      }
+    }
+  }
+}
+
+# range aggregations
+GET orders/_search
+{
+  "size": 0,
+  "aggs": {
+    "amount_distribution":{
+      "range": {
+        "field": "total_amount",
+        "keyed": true, 
+        "ranges": [
+          {
+            "from": 50,
+            "to": 100,
+            "key": "50 to 100"
+          },
+          {
+            "from": 0,
+            "to": 50,
+            "key": "0 to 50"
+          },
+          {
+            "from": 100,
+            "key": "from 100"
+          }
+        ]
+      },
+      "aggs": {
+        "stats": {
+          "stats": {
+            "field": "total_amount"
+          }
+        }
+      }
+    }
+  }
+}
+
+# we can also use the date_range as well
+
+# histograms
+GET orders/_search
+{
+  "size": 0,
+  "aggs": {
+    "amount_distribution": {
+      "histogram": {
+        "field": "total_amount",
+        "interval": 10
+      }
+    }
+  }
+}
+
+# date histogram
+GET orders/_search
+{
+  "size": 0,
+  "aggs": {
+    "amount_distribution": {
+      "date_histogram": {
+        "field": "purchased_at",
+        "calendar_interval": "week",
+        "format": "yyyy-MM-dd"
+      }
+    }
+  }
+}
+
+# ignoring the query part of the body for the aggregations: global aggregations
+GET orders/_search
+{
+  "query": {
+    "range": {
+      "total_amount": {
+        "gte": 100
+      }
+    }
+  },
+  "size": 0, 
+  "aggs": {
+    "all_orders": {
+      "global": {},
+      "aggs": {
+        "stats_amount": {
+          "stats": {
+            "field": "total_amount"
+          }
+        }
+      }
+    }
+  }
+}
+
+# missing field values
+PUT /orders/_doc/1001
+{
+  "total_amount":400
+}
+
+PUT /orders/_doc/1002
+{
+  "total_amount":100,
+  "status":null
+}
+
+GET orders/_search
+{
+  "size": 0,
+  "aggs": {
+    "orders_without_status": {
+      "missing": {
+        "field": "status"
+      }
+    }
+  }
+}
+
+
+
