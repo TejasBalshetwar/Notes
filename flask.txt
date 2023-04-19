@@ -1,0 +1,347 @@
+Multiple route- Multiple pages
+The key to this is in the @app.route() decorator
+The string parameter passed into the decorator determines the URL extension that will link to the function(aka view).
+Currently our homepage or domain is locally represented as http://127.0.0.1:5000/
+We use decorators to add on to this 
+	@app.route('/some_page')
+	http://127.0.0.1:5000/some_page
+Once a page is deployed, 127.0.0.1 will be replaced by the domain (www.site.com)
+
+Dynamic Routing:
+Often we will want URL route extensions to be dynamic based on the situation.
+For example we may want a page per user so thet the extension is in the form:
+	www.site.com/user/unique_user_name
+To achieve this effect we can use dynamic routes.
+Dynamic routes have 2 key aspects:
+	A variable in the route <variable>.
+	A parameter passed into the function.
+Example:
+@app.route('/some_page/<name>')
+def other_page(name):
+	return f"User: {name}"
+
+Redirect and url_for:
+these are used when we want to redirect to different page for different result.
+Example:
+
+@app.route("/puppy_latin/<name>")
+def puppy_latin(name):
+    if name[-1] != "y":
+        puppy_latin = name + "y"
+        return redirect(url_for("with_y",name=puppy_latin))
+
+
+render_template:
+This function is used to render a template i.e an HTML file inside a view function.
+To use this function we need to import it from flask.
+Example:
+from flask import render_template
+@app.route('/some_page')
+def some_page():
+	return render_template('some_page.html')
+
+To use template variables we use something called the jinja template engine.
+This is a templating language that allows us to use python code inside HTML files.
+Example:
+{{variable_name}}
+We can use control flow statements in template using {%...%}
+Example:
+{% if variable_name %}
+	<p>variable_name is true</p>
+{% else %}
+	<p>variable_name is false</p>
+{% endif %}
+Another Example:
+<ul>
+    {% for letter in letters %}
+        <li>{{letter}}</li>
+    {% endfor %}
+</ul>
+
+There is a concept of template inheritance.
+Many html pages share some content like the header and footer.
+To avoid repeating the same code in each page we can use template inheritance.
+This is done by creating a base.html file which contains the common code.
+Then we can create other html files which extend the base.html file.
+Example:
+base.html
+	{% block content %}
+	{% endblock %}
+some_page.html
+	{% extends "base.html" %}
+	{% block content %}
+		<p>some content</p>
+	{% endblock %}
+other_page.html
+	{% extends "base.html" %}
+	{% block content %}
+		<p>some other content</p>
+	{% endblock %}
+
+Filters in flask templates:
+Filters are used to modify the output of a variable.
+Example:
+{{variable_name|lower}}
+{{variable_name|upper}}
+{{variable_name|title}}
+{{variable_name|capitalize}}
+{{variable_name|length}}
+{{variable_name|wordcount}}
+{{variable_name|join(",")}}
+{{variable_name|reverse}}
+
+url_for function:
+This function is used to generate a URL to a specific function.
+Example:
+<a href="{{url_for('some_page')}}">some_page</a>
+This function takes minimum one argument which is the name of the view function.
+It also takes optional arguments which are the parameters to the view function.
+We can also use this function to link static files.
+Example:
+<link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+
+
+Forms:
+Forms are used to collect data from the user.
+To use forms we need to import the following from flask:
+	from flask import Flask, render_template, url_for, request, redirect
+	from flask_wtf import FlaskForm
+	from wtforms import StringField, SubmitField
+	from wtforms.validators import DataRequired
+
+We create a class that inherits from FlaskForm.
+This class will contain the fields of the form.
+Example:
+class InfoForm(FlaskForm):
+	breed = StringField('What breed are you?',validators=[DataRequired()])
+	submit = SubmitField('Submit')
+We can use the form in the view function.
+Example:
+@app.route('/',methods=['GET','POST'])
+def index():
+	form = InfoForm()
+	if form.validate_on_submit():
+		breed = form.breed.data
+		form.breed.data = ''
+		return redirect(url_for('index'))
+	return render_template('index.html',form=form,breed=breed)
+
+form fields:
+There are many types of form fields.
+StringField
+TextAreaField
+PasswordField
+SubmitField
+RadioField
+SelectField
+SelectMultipleField
+FileField
+BooleanField
+DecimalField
+DateTimeField
+HiddenField
+
+Form validation:
+We can use validators to validate the data entered by the user.
+Example:
+from wtforms.validators import DataRequired, Email, Length
+class InfoForm(FlaskForm):
+	breed = StringField('What breed are you?',validators=[DataRequired(),Length(min=2,max=20)])
+	submit = SubmitField('Submit')
+
+Flask session object:
+The session object is used to store data that we want to access across requests.
+Example:
+from flask import Flask, render_template, url_for, request, redirect, session
+
+@app.route('/',methods=['GET','POST'])
+def index():
+	session['breed'] = form.breed.data
+	return redirect(url_for('index'))
+	return render_template('index.html',form=form,breed=breed)
+
+Flask flash messages:
+Flash messages are used to display messages to the user.
+Example:
+from flask import Flask, render_template, url_for, request, redirect, session, flash
+
+@app.route('/',methods=['GET','POST'])
+def index():
+	if form.validate_on_submit():
+		session['breed'] = form.breed.data
+		flash(f"You just changed your breed to {session['breed']}")
+		return redirect(url_for('index'))
+	return render_template('index.html',form=form,breed=breed)
+	
+We can use the bootstrap alert classes to style the flash messages.
+Example:
+{% with messages = get_flashed_messages() %}
+	{% if messages %}
+		{% for message in messages %}
+			<div class="alert alert-success" role="alert">
+				{{message}}
+			</div>
+		{% endfor %}
+	{% endif %}
+{% endwith %}
+
+Flask with SQLite:
+SQLite is a database which is easy to use with flask
+To connect SQL,Python and Flask together we use something called an ORM(Object Relational Mapper).
+There are many ORMs available for python.
+We will use SQLAlchemy.
+flask-sqlalchemy is an extension for flask that adds support for SQLAlchemy to our application.
+To use this extension we need to install it using pip.
+Example:
+pip install flask-sqlalchemy
+
+To use database in flask app:
+1) setup SQLite database in flask app
+2) create a model in flask app
+3) perform basic CRUD on our model
+
+To use this extension we need to import it from flask.
+Example:
+from flask_sqlalchemy import SQLAlchemy
+
+To create SQLite database:
+1) Create flask app
+2) configure flask app to use SQLite database
+3) pass our application into SQLAlchemy class call
+
+To create a model in flask:
+1) Model directly links to a table in SQLite database
+2) You do not need to create table manually
+3) Instead we use model class in python which generates table for us
+
+Similar to flaskForms, for model:
+1) create a class
+2) inherit from db.Model
+3) Optionally provide a table name
+4) Add in table columns as attributes
+5) Add in methods for __int__ and __repr__
+
+class Todo(db.Model):
+    __tablename__="Todos"
+    id = db.Column(db.Integer,primary_key=True)
+    title = db.Column(db.String(200),nullable=False)
+    desc = db.Column(db.String(500),nullable=False)
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self)->str:
+        return f"{self.id} - {self.title}"
+#  does not update if table already present
+with app.app_context():
+    db.create_all()
+
+To perform CRUD on our model:
+1) Create
+2) Read
+3) Update
+4) Delete
+
+Create:
+To create a new record in our database we need to create a new instance of our model class.
+Example:
+new_todo = Todo(title="New Todo",desc="New Todo Description")
+db.session.add(new_todo)
+db.session.commit()
+
+Read:
+To read data from our database we need to query our model class.
+Example:
+all_todos = Todo.query.all()
+first_todo = Todo.query.first()
+first_todo = Todo.query.get(1)
+first_todo = Todo.query.filter_by(title="New Todo").first()
+
+Update:
+To update data in our database we need to query our model class and then update the data.
+Example:
+todo_to_update = Todo.query.get(1)
+todo_to_update.title = "Updated Todo"
+db.session.commit()
+
+Delete:
+To delete data from our database we need to query our model class and then delete the data.
+Example:
+todo_to_delete = Todo.query.get(1)
+db.session.delete(todo_to_delete)
+db.session.commit()
+
+
+
+###flask login:
+Flask-login is an extension for flask that adds user authentication to our application.
+To use this extension we need to install it using pip.
+Example:
+pip install flask-login
+It provides user session management for flask.
+It handles the common tasks of logging in, logging out, and remembering your users’ sessions over extended periods of time.
+It supports cookie based sessions and remember me cookies.
+It is compatible with Flask’s blueprints and can be easily integrated with your application.
+It is compatible with Flask’s built-in security features like CSRF protection.
+It provides a login manager.
+It provides a user mixin which contains things like is_authenticated, is_active, is_anonymous, get_id().
+It provides a login_required decorator.
+It provides a login_user function.
+It provides a logout_user function.
+It provides a current_user proxy.
+
+REST APIs:
+REST stands for Representational State Transfer.
+It is an architectural style for providing standards between computer systems on the web.
+We use flask-restful to create REST APIs.
+To use this extension we need to install it using pip.
+Example:
+pip install flask-restful
+We do mainly four things with REST APIs:
+Create		POST 		create a new object
+Read		GET 		read an object
+Update		PUT 		update an existing object
+Delete		DELETE 		delete an object
+The most common format to send information for a reuqest in REST APIs is JSON.
+JSON stands for JavaScript Object Notation.
+It is a lightweight data-interchange format.
+It is similar to python dictionary.
+
+async and await:
+async and await are used to make asynchronous code in python.
+async is used to define a function as asynchronous.
+await is used to wait for the asynchronous function to complete.
+Example:
+async def main():
+	print("Hello")
+	await asyncio.sleep(1)
+	print("World")
+
+
+### flask Migrations
+Flask-Migrate is an extension that handles SQLAlchemy database migrations for Flask applications using Alembic.
+To use this extension we need to install it using pip.
+Example:
+pip install flask-migrate
+It provides a Migrate class.
+It provides a MigrateCommand class.
+It provides a Manager class.
+It provides a Script class.
+It provides a Server class.
+It provides a Shell class.
+It provides a clean command.
+It provides a current command.
+It provides a db command.
+It provides a downgrade command.
+It provides a edit command.
+It provides a heads command.
+It provides a history command.
+It provides a init command.
+It provides a migrate command.
+It provides a revision command.
+It provides a show command.
+It provides a stamp command.
+It provides a upgrade command.
+
+How to perform migrations:
+1) flask --app "main.py" db init
+2) flask --app "main.py" db migrate
+3) flask --app "main.py" db upgrade
